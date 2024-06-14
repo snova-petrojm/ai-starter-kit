@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import pickle
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 kit_dir = os.path.abspath(os.path.join(current_dir, ".."))
@@ -93,6 +94,8 @@ def main():
             docs = st.file_uploader(
                 "Add PDF or TXT files", accept_multiple_files=True, type=["pdf","txt"]
             )
+            print("Petro: Upload")
+            print(docs)
             st.markdown("**2. Process your documents and create vector store**")
             st.markdown(
                 "**Note:** Depending on the size and number of your documents, this could take several minutes"
@@ -101,7 +104,15 @@ def main():
             if st.button("Process"):
                 with st.spinner("Processing"):
                     # get pdf text
+                    print("Petro: get pdf text")
                     raw_text, meta_data = documentRetrieval.get_data_for_splitting(docs)
+                    with open('raw_text.pkl','wb') as file:
+                        pickle.dump(raw_text,file)
+                    with open('meta_data.pkl','wb') as file2:
+                        pickle.dump(meta_data,file2)
+                    print(type(raw_text))
+                    print(raw_text)
+                    print(meta_data)
                     # get the text chunks
                     text_chunks = documentRetrieval.get_text_chunks_with_metadata(docs=raw_text, meta_data=meta_data)
                     # create vector store
@@ -114,6 +125,8 @@ def main():
                     st.toast(f"File uploaded! Go ahead and ask some questions",icon='🎉')
             st.markdown("[Optional] Save database for reuse")
             save_location = st.text_input("Save location", "./data/my-vector-db").strip()
+            print('Petro: save')
+            print(save_location)
             if st.button("Process and Save database"):
                 with st.spinner("Processing"):
                     # get pdf text
